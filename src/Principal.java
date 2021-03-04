@@ -16,6 +16,8 @@ public class Principal {
 		double pvp = 0.0;
 		boolean salir = false;
 		String op = "";
+		int control = 0;
+		boolean oc = false;
 		
 		do {
 			//Le pedido que consumición quiere
@@ -28,14 +30,35 @@ public class Principal {
 				if (cant>0) {
 					//Buscamos el precio de ese producto
 					pvp = precio(con);
-					System.out.println("Precio: " + pvp);
-					if(pvp<=0) {
-						System.out.println("El producto actualmente está agotado");
-						salir = true;
-					}else {
-						if(cant > 0 && pvp >0) {
-							consu.add(new Consumicion(con, cant, pvp));
+					//Si el precio es menor o igual a 0, el producto está agotado
+					// y se le pide un nuevo producto.
+					do {
+						if(pvp<=0) {
+							System.out.println("El producto actualmente está agotado");
+							if(control == 2) {
+								oc = true;
+							}else {
+								System.out.println("Dispones de " + (3-(control+1)) + " intentos");
+							}
+							System.out.println("Elija otro producto");
+							con = pedirConsumicion();
+							pvp = precio(con);
+							if(!con.equals("") && pvp>0) {
+								oc = true;
+							}
+							System.out.println("Indica de nuevo la cantidad");
+							cant = pedirCantidad();
+							if(cant<=0) {
+								oc = true;
+							}
+						}else {
+							oc = true;
 						}
+						control++;
+					}while(!oc);
+					System.out.println("Precio: " + pvp);
+					if(pvp>0) {
+						consu.add(new Consumicion(con, cant, pvp));
 						
 						System.out.println("Para seguir pidiendo teclee SI: ");
 						op = sc.nextLine();
@@ -51,9 +74,12 @@ public class Principal {
 							System.out.println("Aquí tiene su comida, que aproveche");
 							System.out.printf("Son %.2f Euros", total);
 							salir = true;
+						}else {
+							System.out.println();
 						}
-						System.out.println();
-					}
+					}else {
+						salir = true;
+					}	
 				}else {
 					salir = true;
 				}
